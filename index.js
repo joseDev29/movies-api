@@ -14,12 +14,16 @@ const { notFoundHandler } = require("./utils/middleware/notFoundHandler");
 
 const moviesAPI = require("./routes/movies");
 const userMoviesApi = require("./routes/userMovies");
+const authApi = require("./routes/auth");
 
 //body parser
 app.use(express.json());
 
+//routes
+authApi(app);
 moviesAPI(app);
 userMoviesApi(app);
+
 //catch 404
 app.use(notFoundHandler);
 //Los middleware de error siempre deben ir despues de las rutas
