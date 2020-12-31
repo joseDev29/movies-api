@@ -13,6 +13,10 @@ const {
   FIVE_MINUTES_IN_SECONDS,
   SIXTY_MINUTES_IN_SECONDS,
 } = require("../utils/time");
+const passport = require("passport");
+
+//JWT strategy
+require("../utils/auth/strategies/jwt");
 
 const moviesAPI = (app) => {
   const router = express.Router();
@@ -20,22 +24,27 @@ const moviesAPI = (app) => {
 
   const moviesService = new MoviesService();
 
-  router.get("/", async (req, res, next) => {
-    cacheResponse(res, FIVE_MINUTES_IN_SECONDS);
-    const { tags } = req.query;
-    try {
-      const movies = await moviesService.getMovies({ tags });
-      res.status(200).json({
-        data: movies,
-        message: "movies listed",
-      });
-    } catch (err) {
-      next(err);
+  router.get(
+    "/",
+    passport.authenticate("jwt", { session: false }),
+    async (req, res, next) => {
+      cacheResponse(res, FIVE_MINUTES_IN_SECONDS);
+      const { tags } = req.query;
+      try {
+        const movies = await moviesService.getMovies({ tags });
+        res.status(200).json({
+          data: movies,
+          message: "movies listed",
+        });
+      } catch (err) {
+        next(err);
+      }
     }
-  });
+  );
 
   router.get(
     "/:movieId",
+    passport.authenticate("jwt", { session: false }),
     validationHandler({ movieId: movieIdSchema }, "params"),
     async (req, res, next) => {
       cacheResponse(res, SIXTY_MINUTES_IN_SECONDS);
@@ -54,6 +63,7 @@ const moviesAPI = (app) => {
 
   router.post(
     "/",
+    passport.authenticate("jwt", { session: false }),
     validationHandler(createMovieSchema),
     async (req, res, next) => {
       const { body: movie } = req;
@@ -72,6 +82,7 @@ const moviesAPI = (app) => {
 
   router.put(
     "/:movieId",
+    passport.authenticate("jwt", { session: false }),
     validationHandler({ movieId: movieIdSchema }, "params"),
     validationHandler(updateMovieSchema),
     async (req, res, next) => {
@@ -95,6 +106,7 @@ const moviesAPI = (app) => {
 
   router.delete(
     "/:movieId",
+    passport.authenticate("jwt", { session: false }),
     validationHandler({ movieId: movieIdSchema }, "params"),
     async (req, res, next) => {
       const { movieId } = req.params;

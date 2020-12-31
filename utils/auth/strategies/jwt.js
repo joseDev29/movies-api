@@ -8,7 +8,7 @@ passport.use(
   new Strategy(
     {
       secretOrKey: config.authJwtSecret,
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken,
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     },
     async (tokenPayload, cb) => {
       const userService = new UserService();
