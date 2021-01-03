@@ -1,4 +1,5 @@
 const express = require("express");
+const helmet = require("helmet");
 
 const { config } = require("./config/index");
 
@@ -18,6 +19,7 @@ const authApi = require("./routes/auth");
 
 //body parser
 app.use(express.json());
+app.use(helmet());
 
 //routes
 authApi(app);
